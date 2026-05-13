@@ -14,8 +14,15 @@ export function ContactForm() {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Format message for WhatsApp
+    const whatsappNumber = "256709331135"
+    const whatsappMessage = encodeURIComponent(
+      `Hi Nelson_Labs!\n\nName: ${name}\n\nMessage: ${message}`
+    )
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
+    
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, "_blank")
     
     setIsSubmitting(false)
     setSubmitted(true)
@@ -31,10 +38,10 @@ export function ContactForm() {
       <div className="glass rounded-2xl p-6 md:p-8 space-y-5">
         <div className="text-center space-y-2">
           <h3 className="text-xl font-bold text-foreground">
-            {"Want a commission? Reach out!"}
+            Get in Touch
           </h3>
           <p className="text-sm text-muted-foreground">
-            {"I'd love to hear from you"}
+            Send me a message on WhatsApp
           </p>
         </div>
 

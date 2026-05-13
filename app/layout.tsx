@@ -10,11 +10,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ALEX | Building the Future of Trading',
-  description: 'Connect with Alex - entrepreneur, trader, and builder of next-gen trading platforms.',
+  title: 'Nelson_Labs | Building the Future of Trading',
+  description: 'Connect with Nelson_Labs - entrepreneur, trader, and creator of SMC Terminal.',
   openGraph: {
-    title: 'ALEX | Building the Future of Trading',
-    description: 'Connect with Alex - entrepreneur, trader, and builder of next-gen trading platforms.',
+    title: 'Nelson_Labs | Building the Future of Trading',
+    description: 'Connect with Nelson_Labs - entrepreneur, trader, and creator of SMC Terminal.',
     type: 'website',
   },
   generator: 'v0.app',

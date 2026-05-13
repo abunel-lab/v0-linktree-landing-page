@@ -22,8 +22,8 @@ export function ProfileHeader() {
       {/* Username with decorative stars */}
       <div className="flex items-center gap-2">
         <span className="text-secondary text-xl">&#10022;</span>
-        <h1 className="text-4xl md:text-5xl font-black tracking-wider text-primary uppercase">
-          ALEX
+        <h1 className="text-3xl md:text-4xl font-black tracking-wider text-primary uppercase">
+          Nelson_Labs
         </h1>
         <span className="text-secondary text-xl">&#10022;</span>
       </div>

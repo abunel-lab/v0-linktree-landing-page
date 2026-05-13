@@ -63,7 +63,7 @@ const socialLinks = [
   { name: "YouTube", href: "#", icon: YouTubeIcon },
   { name: "TikTok", href: "#", icon: TikTokIcon },
   { name: "Website", href: "#", icon: Globe },
-  { name: "WhatsApp", href: "#", icon: WhatsAppIcon },
+  { name: "WhatsApp", href: "https://wa.me/256709331135", icon: WhatsAppIcon },
   { name: "Telegram", href: "#", icon: Send },
 ]
 

@@ -7,7 +7,9 @@ export function FeaturedCard() {
   return (
     <div className="w-full opacity-0 animate-fade-in-up delay-200">
       <a
-        href="#"
+        href="https://expert-robot-replit-production.up.railway.app/"
+        target="_blank"
+        rel="noopener noreferrer"
         className="group relative block w-full overflow-hidden rounded-2xl hover-glow-teal"
       >
         {/* Background Image */}
@@ -32,11 +34,11 @@ export function FeaturedCard() {
             </div>
             
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-              Next-Gen Trading Platform
+              SMC TERMINAL
             </h2>
             
             <p className="text-muted-foreground text-sm md:text-base">
-              Automated strategies powered by AI. Join thousands of traders maximizing their potential.
+              Advanced Smart Money Concepts trading terminal. Professional-grade tools for serious traders.
             </p>
             
             <div className="flex items-center gap-2 text-primary font-medium pt-2">
