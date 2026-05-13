@@ -4,7 +4,12 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Send } from "lucide-react"
 
-export function ContactForm() {
+interface ContactFormProps {
+  displayName: string
+  whatsappNumber: string
+}
+
+export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
   const [name, setName] = useState("")
   const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -15,11 +20,11 @@ export function ContactForm() {
     setIsSubmitting(true)
     
     // Format message for WhatsApp
-    const whatsappNumber = "256709331135"
+    const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '')
     const whatsappMessage = encodeURIComponent(
-      `Hi Nelson_Labs!\n\nName: ${name}\n\nMessage: ${message}`
+      `Hi ${displayName}!\n\nName: ${name}\n\nMessage: ${message}`
     )
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${whatsappMessage}`
     
     // Open WhatsApp in new tab
     window.open(whatsappUrl, "_blank")

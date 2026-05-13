@@ -1,6 +1,6 @@
 "use client"
 
-import { Globe, MessageCircle, Send } from "lucide-react"
+import { Globe, Send } from "lucide-react"
 
 // Custom X (Twitter) icon
 function XIcon({ className }: { className?: string }) {
@@ -58,22 +58,42 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
-const socialLinks = [
-  { name: "X", href: "#", icon: XIcon },
-  { name: "YouTube", href: "#", icon: YouTubeIcon },
-  { name: "TikTok", href: "#", icon: TikTokIcon },
-  { name: "Website", href: "#", icon: Globe },
-  { name: "WhatsApp", href: "https://wa.me/256709331135", icon: WhatsAppIcon },
-  { name: "Telegram", href: "#", icon: Send },
-]
+interface SocialIconsProps {
+  socialX?: string | null
+  socialYoutube?: string | null
+  socialTiktok?: string | null
+  socialWebsite?: string | null
+  socialWhatsapp?: string | null
+  socialTelegram?: string | null
+}
 
-export function SocialIcons() {
+export function SocialIcons({
+  socialX,
+  socialYoutube,
+  socialTiktok,
+  socialWebsite,
+  socialWhatsapp,
+  socialTelegram,
+}: SocialIconsProps) {
+  const socialLinks = [
+    { name: "X", href: socialX, icon: XIcon },
+    { name: "YouTube", href: socialYoutube, icon: YouTubeIcon },
+    { name: "TikTok", href: socialTiktok, icon: TikTokIcon },
+    { name: "Website", href: socialWebsite, icon: Globe },
+    { name: "WhatsApp", href: socialWhatsapp ? `https://wa.me/${socialWhatsapp.replace(/[^0-9]/g, '')}` : null, icon: WhatsAppIcon },
+    { name: "Telegram", href: socialTelegram, icon: Send },
+  ].filter(link => link.href) // Only show links that have URLs
+
+  if (socialLinks.length === 0) return null
+
   return (
     <div className="flex items-center justify-center gap-4 opacity-0 animate-fade-in-up delay-100">
       {socialLinks.map((social) => (
         <a
           key={social.name}
-          href={social.href}
+          href={social.href || "#"}
+          target="_blank"
+          rel="noopener noreferrer"
           className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:scale-110"
           aria-label={social.name}
         >

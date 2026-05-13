@@ -2,8 +2,21 @@ import { ProfileHeader } from "@/components/profile-header"
 import { SocialIcons } from "@/components/social-icons"
 import { FeaturedCard } from "@/components/featured-card"
 import { ContactForm } from "@/components/contact-form"
+import { createClient } from "@/lib/supabase/server"
+import type { SiteSettings } from "@/lib/types"
 
-export default function LinkInBioPage() {
+export const revalidate = 60 // Revalidate every 60 seconds
+
+export default async function LinkInBioPage() {
+  const supabase = await createClient()
+  
+  const { data: settings } = await supabase
+    .from("site_settings")
+    .select("*")
+    .single()
+
+  const siteSettings = settings as SiteSettings | null
+
   return (
     <>
       {/* Grain texture overlay */}
@@ -21,16 +34,35 @@ export default function LinkInBioPage() {
       <main className="min-h-screen flex flex-col items-center px-4 py-12 md:py-16">
         <div className="w-full max-w-md space-y-8">
           {/* Profile Header */}
-          <ProfileHeader />
+          <ProfileHeader 
+            displayName={siteSettings?.display_name || "Nelson_Labs"}
+            bio={siteSettings?.bio || "Building the future of trading"}
+            profileImageUrl={siteSettings?.profile_image_url}
+          />
 
           {/* Social Icons */}
-          <SocialIcons />
+          <SocialIcons 
+            socialX={siteSettings?.social_x}
+            socialYoutube={siteSettings?.social_youtube}
+            socialTiktok={siteSettings?.social_tiktok}
+            socialWebsite={siteSettings?.social_website}
+            socialWhatsapp={siteSettings?.social_whatsapp}
+            socialTelegram={siteSettings?.social_telegram}
+          />
 
           {/* Featured Card */}
-          <FeaturedCard />
+          <FeaturedCard 
+            title={siteSettings?.featured_title || "SMC TERMINAL"}
+            description={siteSettings?.featured_description || "Advanced Smart Money Concepts trading terminal."}
+            url={siteSettings?.featured_url || "#"}
+            imageUrl={siteSettings?.featured_image_url}
+          />
 
           {/* Contact Form */}
-          <ContactForm />
+          <ContactForm 
+            displayName={siteSettings?.display_name || "Nelson_Labs"}
+            whatsappNumber={siteSettings?.whatsapp_number || "256709331135"}
+          />
 
           {/* Footer */}
           <footer className="text-center pt-4 opacity-0 animate-fade-in delay-500">
