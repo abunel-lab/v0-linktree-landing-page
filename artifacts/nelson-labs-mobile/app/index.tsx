@@ -7,9 +7,11 @@ import {
   RefreshControl,
   Platform,
   Animated,
+  TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { ProfileHeader } from "@/components/ProfileHeader";
@@ -20,6 +22,7 @@ import { ContactSection } from "@/components/ContactSection";
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { data: settings, isLoading, refetch, isRefetching } = useSiteSettings();
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -91,9 +94,20 @@ export default function HomeScreen() {
             displayName={settings?.display_name ?? "Nelson_Labs"}
           />
 
-          <Text style={[styles.footer, { color: colors.mutedForeground }]}>
-            Powered by passion
-          </Text>
+          <View style={styles.footerRow}>
+            <Text style={[styles.footer, { color: colors.mutedForeground }]}>
+              Powered by passion
+            </Text>
+            <TouchableOpacity
+              onPress={() => router.push("/admin/login" as never)}
+              style={styles.adminButton}
+              activeOpacity={0.6}
+            >
+              <Text style={[styles.adminText, { color: colors.mutedForeground }]}>
+                Admin
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -114,10 +128,25 @@ const styles = StyleSheet.create({
     gap: 28,
     alignItems: "stretch",
   },
+  footerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
   footer: {
     textAlign: "center",
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     opacity: 0.6,
+  },
+  adminButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  adminText: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    opacity: 0.4,
   },
 });

@@ -23,6 +23,7 @@ function RootLayoutNav() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="admin" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
