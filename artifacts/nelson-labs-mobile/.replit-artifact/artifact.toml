@@ -1,0 +1,31 @@
+kind = "mobile"
+previewPath = "/mobile"
+title = "Nelson Labs Mobile"
+version = "1.0.0"
+id = "nelson-labs-mobile"
+router = "path"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+name = "expo"
+paths = ["/mobile"]
+localPort = 8083
+
+[services.development]
+run = "pnpm --filter @workspace/nelson-labs-mobile run dev"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/nelson-labs-mobile", "run", "build"]
+publicDir = "artifacts/nelson-labs-mobile/dist"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "8083"
+BASE_PATH = "/mobile"
