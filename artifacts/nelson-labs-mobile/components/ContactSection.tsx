@@ -12,6 +12,8 @@ interface Props {
 
 export function ContactSection({ whatsappNumber, socialTelegram, displayName }: Props) {
   const colors = useColors();
+  const whatsappColor = colors.social.whatsapp;
+  const telegramColor = colors.social.telegram;
 
   const openWhatsApp = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -47,15 +49,15 @@ export function ContactSection({ whatsappNumber, socialTelegram, displayName }: 
             style={({ pressed }) => [
               styles.button,
               {
-                backgroundColor: "#25D366" + "18",
-                borderColor: "#25D366" + "60",
+                backgroundColor: whatsappColor + "18",
+                borderColor: whatsappColor + "60",
                 opacity: pressed ? 0.7 : 1,
                 transform: [{ scale: pressed ? 0.97 : 1 }],
               },
             ]}
           >
-            <FontAwesome5 name="whatsapp" size={20} color="#25D366" />
-            <Text style={[styles.buttonText, { color: "#25D366" }]}>
+            <FontAwesome5 name="whatsapp" size={20} color={whatsappColor} />
+            <Text style={[styles.buttonText, { color: whatsappColor }]}>
               WhatsApp
             </Text>
           </Pressable>
@@ -66,15 +68,15 @@ export function ContactSection({ whatsappNumber, socialTelegram, displayName }: 
             style={({ pressed }) => [
               styles.button,
               {
-                backgroundColor: "#2AABEE" + "18",
-                borderColor: "#2AABEE" + "60",
+                backgroundColor: telegramColor + "18",
+                borderColor: telegramColor + "60",
                 opacity: pressed ? 0.7 : 1,
                 transform: [{ scale: pressed ? 0.97 : 1 }],
               },
             ]}
           >
-            <FontAwesome5 name="telegram" size={20} color="#2AABEE" />
-            <Text style={[styles.buttonText, { color: "#2AABEE" }]}>
+            <FontAwesome5 name="telegram" size={20} color={telegramColor} />
+            <Text style={[styles.buttonText, { color: telegramColor }]}>
               Telegram
             </Text>
           </Pressable>

@@ -40,6 +40,11 @@ const colors = {
     input: "#151F30",
   },
   radius: 12,
+
+  social: {
+    whatsapp: "#25D366",
+    telegram: "#2AABEE",
+  },
 };
 
 export default colors;
