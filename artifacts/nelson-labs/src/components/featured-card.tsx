@@ -1,4 +1,5 @@
 import { ArrowRight, Sparkles } from "lucide-react"
+import { trackClick } from "@/lib/analytics"
 
 interface FeaturedCardProps {
   title: string
@@ -14,6 +15,7 @@ export function FeaturedCard({ title, description, url, imageUrl }: FeaturedCard
         href={url}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackClick("featured")}
         className="group relative block w-full overflow-hidden rounded-2xl hover-glow-teal"
       >
         <div className="absolute inset-0">

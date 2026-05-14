@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Send } from "lucide-react"
+import { trackClick } from "@/lib/analytics"
 
 interface ContactFormProps {
   displayName: string
@@ -16,6 +17,8 @@ export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+
+    trackClick("contact_whatsapp")
 
     const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '')
     const whatsappMessage = encodeURIComponent(

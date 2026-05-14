@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useLocation } from "wouter"
 import type { SiteSettings } from "@/lib/types"
@@ -12,6 +12,8 @@ import {
   Check,
   ExternalLink,
   Image as ImageIcon,
+  BarChart2,
+  MousePointerClick,
 } from "lucide-react"
 
 interface AdminDashboardProps {
@@ -19,12 +21,58 @@ interface AdminDashboardProps {
   userEmail: string
 }
 
+interface ClickStat {
+  link_type: string
+  count: number
+}
+
+const LINK_LABELS: Record<string, string> = {
+  x: "X (Twitter)",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  website: "Website",
+  whatsapp: "WhatsApp",
+  telegram: "Telegram",
+  featured: "SMC Terminal Card",
+  contact_whatsapp: "Contact Form",
+}
+
 export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardProps) {
   const [settings, setSettings] = useState<SiteSettings>(initialSettings)
-  const [activeTab, setActiveTab] = useState<"profile" | "social" | "featured">("profile")
+  const [activeTab, setActiveTab] = useState<"profile" | "social" | "featured" | "analytics">("profile")
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [, setLocation] = useLocation()
+  const [clickStats, setClickStats] = useState<ClickStat[]>([])
+  const [statsLoading, setStatsLoading] = useState(false)
+  const [totalClicks, setTotalClicks] = useState(0)
+
+  useEffect(() => {
+    if (activeTab === "analytics") {
+      loadAnalytics()
+    }
+  }, [activeTab])
+
+  const loadAnalytics = async () => {
+    setStatsLoading(true)
+    const supabase = createClient()
+    const { data } = await supabase
+      .from("link_clicks")
+      .select("link_type")
+
+    if (data) {
+      const counts: Record<string, number> = {}
+      for (const row of data) {
+        counts[row.link_type] = (counts[row.link_type] || 0) + 1
+      }
+      const stats = Object.entries(counts)
+        .map(([link_type, count]) => ({ link_type, count }))
+        .sort((a, b) => b.count - a.count)
+      setClickStats(stats)
+      setTotalClicks(data.length)
+    }
+    setStatsLoading(false)
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -72,11 +120,13 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
     { id: "profile" as const, label: "Profile", icon: User },
     { id: "social" as const, label: "Social", icon: Link },
     { id: "featured" as const, label: "Featured", icon: FileText },
+    { id: "analytics" as const, label: "Analytics", icon: BarChart2 },
   ]
+
+  const maxCount = clickStats.length > 0 ? clickStats[0].count : 1
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -94,7 +144,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
               href="/"
               target="_blank"
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-muted/50"
-              title="View site"
             >
               <ExternalLink className="w-4 h-4" />
               <span className="hidden sm:inline">View Site</span>
@@ -102,7 +151,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-muted/50"
-              title="Logout"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
@@ -112,13 +160,12 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
       </header>
 
       <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Tab bar */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-medium transition-all text-sm ${
+              className={`flex-1 min-w-0 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-medium transition-all text-sm whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-accent text-background shadow-sm"
                   : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -130,12 +177,10 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
           ))}
         </div>
 
-        {/* Tab content */}
         <div className="glass-card rounded-2xl p-5">
           {activeTab === "profile" && (
             <div className="space-y-5">
               <h2 className="text-lg font-bold text-foreground">Profile Settings</h2>
-
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Display Name</label>
@@ -148,7 +193,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     autoComplete="off"
                   />
                 </div>
-
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Bio / Tagline</label>
                   <input
@@ -160,7 +204,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     autoComplete="off"
                   />
                 </div>
-
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <ImageIcon className="w-4 h-4" />
@@ -177,7 +220,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                   />
                   <p className="text-xs text-muted-foreground">Direct link to your profile image (JPG, PNG, WebP)</p>
                 </div>
-
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">WhatsApp Number</label>
                   <input
@@ -200,7 +242,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                 <h2 className="text-lg font-bold text-foreground">Social Media Links</h2>
                 <p className="text-muted-foreground text-sm mt-1">Leave blank to hide a link.</p>
               </div>
-
               <div className="space-y-4">
                 {[
                   { label: "X (Twitter)", field: "social_x" as const, placeholder: "https://x.com/yourusername" },
@@ -230,7 +271,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
           {activeTab === "featured" && (
             <div className="space-y-5">
               <h2 className="text-lg font-bold text-foreground">Featured Card</h2>
-
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Title</label>
@@ -243,7 +283,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     autoComplete="off"
                   />
                 </div>
-
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Description</label>
                   <textarea
@@ -254,7 +293,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     placeholder="Describe your product or service..."
                   />
                 </div>
-
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Link URL</label>
                   <input
@@ -267,7 +305,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     inputMode="url"
                   />
                 </div>
-
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <ImageIcon className="w-4 h-4" />
@@ -287,33 +324,91 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
               </div>
             </div>
           )}
+
+          {activeTab === "analytics" && (
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Link Analytics</h2>
+                <button
+                  onClick={loadAnalytics}
+                  className="text-xs text-accent hover:underline"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {statsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                </div>
+              ) : clickStats.length === 0 ? (
+                <div className="text-center py-12 space-y-3">
+                  <MousePointerClick className="w-10 h-10 text-muted-foreground/40 mx-auto" />
+                  <p className="text-muted-foreground text-sm">No clicks recorded yet.</p>
+                  <p className="text-muted-foreground/60 text-xs">Clicks will appear here once visitors start using your links.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-muted/30 rounded-xl px-4 py-3 flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total clicks</span>
+                    <span className="text-2xl font-bold text-foreground">{totalClicks}</span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {clickStats.map((stat) => {
+                      const pct = Math.round((stat.count / maxCount) * 100)
+                      return (
+                        <div key={stat.link_type} className="space-y-1.5">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-foreground font-medium">
+                              {LINK_LABELS[stat.link_type] ?? stat.link_type}
+                            </span>
+                            <span className="text-muted-foreground tabular-nums">
+                              {stat.count} {stat.count === 1 ? "click" : "clicks"}
+                            </span>
+                          </div>
+                          <div className="h-2 bg-muted/50 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-accent to-secondary rounded-full transition-all duration-500"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Save button — full width on mobile */}
-        <div className="mt-5">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-accent to-secondary text-background font-semibold py-4 px-6 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Saving...
-              </>
-            ) : saved ? (
-              <>
-                <Check className="w-5 h-5" />
-                Saved!
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5" />
-                Save Changes
-              </>
-            )}
-          </button>
-        </div>
+        {activeTab !== "analytics" && (
+          <div className="mt-5">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-accent to-secondary text-background font-semibold py-4 px-6 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Saving...
+                </>
+              ) : saved ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  Saved!
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

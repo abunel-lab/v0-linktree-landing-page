@@ -1,4 +1,5 @@
 import { Globe, Send } from "lucide-react"
+import { trackClick } from "@/lib/analytics"
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -50,12 +51,12 @@ export function SocialIcons({
   socialTelegram,
 }: SocialIconsProps) {
   const socialLinks = [
-    { name: "X", href: socialX, icon: XIcon },
-    { name: "YouTube", href: socialYoutube, icon: YouTubeIcon },
-    { name: "TikTok", href: socialTiktok, icon: TikTokIcon },
-    { name: "Website", href: socialWebsite, icon: Globe },
-    { name: "WhatsApp", href: socialWhatsapp ? `https://wa.me/${socialWhatsapp.replace(/[^0-9]/g, '')}` : null, icon: WhatsAppIcon },
-    { name: "Telegram", href: socialTelegram, icon: Send },
+    { name: "X", key: "x", href: socialX, icon: XIcon },
+    { name: "YouTube", key: "youtube", href: socialYoutube, icon: YouTubeIcon },
+    { name: "TikTok", key: "tiktok", href: socialTiktok, icon: TikTokIcon },
+    { name: "Website", key: "website", href: socialWebsite, icon: Globe },
+    { name: "WhatsApp", key: "whatsapp", href: socialWhatsapp ? `https://wa.me/${socialWhatsapp.replace(/[^0-9]/g, '')}` : null, icon: WhatsAppIcon },
+    { name: "Telegram", key: "telegram", href: socialTelegram, icon: Send },
   ].filter(link => link.href)
 
   if (socialLinks.length === 0) return null
@@ -68,6 +69,7 @@ export function SocialIcons({
           href={social.href || "#"}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackClick(social.key)}
           className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:scale-110"
           aria-label={social.name}
         >
