@@ -70,91 +70,98 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
 
   const tabs = [
     { id: "profile" as const, label: "Profile", icon: User },
-    { id: "social" as const, label: "Social Links", icon: Link },
-    { id: "featured" as const, label: "Featured Card", icon: FileText },
+    { id: "social" as const, label: "Social", icon: Link },
+    { id: "featured" as const, label: "Featured", icon: FileText },
   ]
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
-              <User className="w-5 h-5 text-background" />
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
+              <User className="w-4 h-4 text-background" />
             </div>
-            <div>
-              <h1 className="font-bold text-foreground">Admin Panel</h1>
-              <p className="text-xs text-muted-foreground">{userEmail}</p>
+            <div className="min-w-0">
+              <h1 className="font-bold text-foreground text-sm leading-tight">Admin Panel</h1>
+              <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 shrink-0">
             <a
               href="/"
               target="_blank"
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-muted/50"
+              title="View site"
             >
               <ExternalLink className="w-4 h-4" />
-              View Site
+              <span className="hidden sm:inline">View Site</span>
             </a>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-red-400 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-muted/50"
+              title="Logout"
             >
               <LogOut className="w-4 h-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* Tab bar */}
+        <div className="flex gap-2 mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-medium transition-all text-sm ${
                 activeTab === tab.id
-                  ? "bg-accent text-background"
+                  ? "bg-accent text-background shadow-sm"
                   : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
+              <tab.icon className="w-4 h-4 shrink-0" />
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="glass-card rounded-2xl p-6 md:p-8">
+        {/* Tab content */}
+        <div className="glass-card rounded-2xl p-5">
           {activeTab === "profile" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-foreground">Profile Settings</h2>
+            <div className="space-y-5">
+              <h2 className="text-lg font-bold text-foreground">Profile Settings</h2>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Display Name</label>
                   <input
                     type="text"
                     value={settings.display_name}
                     onChange={(e) => updateField("display_name", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
                     placeholder="Your display name"
+                    autoComplete="off"
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Bio / Tagline</label>
                   <input
                     type="text"
                     value={settings.bio}
                     onChange={(e) => updateField("bio", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
                     placeholder="Your tagline"
+                    autoComplete="off"
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <ImageIcon className="w-4 h-4" />
                     Profile Image URL
@@ -163,57 +170,56 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     type="url"
                     value={settings.profile_image_url || ""}
                     onChange={(e) => updateField("profile_image_url", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                    placeholder="https://example.com/your-photo.jpg"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
+                    placeholder="https://example.com/photo.jpg"
+                    autoComplete="off"
+                    inputMode="url"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Enter a direct link to your profile image (JPG, PNG, WebP)
-                  </p>
+                  <p className="text-xs text-muted-foreground">Direct link to your profile image (JPG, PNG, WebP)</p>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-foreground">
-                    WhatsApp Number (for contact form)
-                  </label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-foreground">WhatsApp Number</label>
                   <input
-                    type="text"
+                    type="tel"
                     value={settings.whatsapp_number || ""}
                     onChange={(e) => updateField("whatsapp_number", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                    placeholder="256709331135 (without + sign)"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
+                    placeholder="256709331135"
+                    inputMode="numeric"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Country code + number without spaces or special characters
-                  </p>
+                  <p className="text-xs text-muted-foreground">Country code + number, no spaces or + sign</p>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === "social" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-foreground">Social Media Links</h2>
-              <p className="text-muted-foreground text-sm">
-                Add your social media URLs. Leave blank to hide a link.
-              </p>
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Social Media Links</h2>
+                <p className="text-muted-foreground text-sm mt-1">Leave blank to hide a link.</p>
+              </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
                 {[
-                  { label: "X (Twitter)", field: "social_x" as const, type: "url", placeholder: "https://x.com/yourusername" },
-                  { label: "YouTube", field: "social_youtube" as const, type: "url", placeholder: "https://youtube.com/@yourchannel" },
-                  { label: "TikTok", field: "social_tiktok" as const, type: "url", placeholder: "https://tiktok.com/@yourusername" },
-                  { label: "Website", field: "social_website" as const, type: "url", placeholder: "https://yourwebsite.com" },
-                  { label: "WhatsApp", field: "social_whatsapp" as const, type: "text", placeholder: "+256709331135" },
-                  { label: "Telegram", field: "social_telegram" as const, type: "url", placeholder: "https://t.me/yourusername" },
-                ].map(({ label, field, type, placeholder }) => (
-                  <div key={field} className="space-y-2">
+                  { label: "X (Twitter)", field: "social_x" as const, placeholder: "https://x.com/yourusername" },
+                  { label: "YouTube", field: "social_youtube" as const, placeholder: "https://youtube.com/@yourchannel" },
+                  { label: "TikTok", field: "social_tiktok" as const, placeholder: "https://tiktok.com/@yourusername" },
+                  { label: "Website", field: "social_website" as const, placeholder: "https://yourwebsite.com" },
+                  { label: "WhatsApp (social link)", field: "social_whatsapp" as const, placeholder: "+256709331135" },
+                  { label: "Telegram", field: "social_telegram" as const, placeholder: "https://t.me/yourusername" },
+                ].map(({ label, field, placeholder }) => (
+                  <div key={field} className="space-y-1.5">
                     <label className="text-sm font-medium text-foreground">{label}</label>
                     <input
-                      type={type}
+                      type="url"
                       value={settings[field] || ""}
                       onChange={(e) => updateField(field, e.target.value)}
-                      className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
+                      className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
                       placeholder={placeholder}
+                      autoComplete="off"
+                      inputMode="url"
                     />
                   </div>
                 ))}
@@ -222,69 +228,73 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
           )}
 
           {activeTab === "featured" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-foreground">Featured Card Settings</h2>
+            <div className="space-y-5">
+              <h2 className="text-lg font-bold text-foreground">Featured Card</h2>
 
-              <div className="grid gap-6">
-                <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Title</label>
                   <input
                     type="text"
                     value={settings.featured_title}
                     onChange={(e) => updateField("featured_title", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
                     placeholder="Your Product Name"
+                    autoComplete="off"
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Description</label>
                   <textarea
                     value={settings.featured_description}
                     onChange={(e) => updateField("featured_description", e.target.value)}
                     rows={3}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all resize-none"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all resize-none text-base"
                     placeholder="Describe your product or service..."
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">Link URL</label>
                   <input
                     type="url"
                     value={settings.featured_url}
                     onChange={(e) => updateField("featured_url", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
                     placeholder="https://yourproduct.com"
+                    autoComplete="off"
+                    inputMode="url"
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground flex items-center gap-2">
                     <ImageIcon className="w-4 h-4" />
-                    Background Image URL (optional)
+                    Background Image URL
                   </label>
                   <input
                     type="url"
                     value={settings.featured_image_url || ""}
                     onChange={(e) => updateField("featured_image_url", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                    placeholder="https://example.com/product-image.jpg"
+                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
+                    placeholder="https://example.com/image.jpg"
+                    autoComplete="off"
+                    inputMode="url"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Leave blank to use the default gradient background
-                  </p>
+                  <p className="text-xs text-muted-foreground">Leave blank to use the default gradient</p>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="mt-8 flex justify-end">
+        {/* Save button — full width on mobile */}
+        <div className="mt-5">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 bg-gradient-to-r from-accent to-secondary text-background font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-accent to-secondary text-background font-semibold py-4 px-6 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
           >
             {saving ? (
               <>
