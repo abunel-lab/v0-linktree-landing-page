@@ -176,11 +176,11 @@
   box-shadow: 0 0 20px var(--glow-primary), 0 0 40px var(--glow-primary);
 }
 
-.hover-glow-teal {
+.hover-glow {
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.hover-glow-teal:hover {
+.hover-glow:hover {
   box-shadow: 0 0 25px var(--glow-primary), 0 0 50px var(--glow-primary);
   transform: translateY(-2px);
 }

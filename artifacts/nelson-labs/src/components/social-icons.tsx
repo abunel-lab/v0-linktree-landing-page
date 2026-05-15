@@ -16,7 +16,9 @@ export function SocialIcons({ links }: SocialIconsProps) {
         const Icon = getPlatformIcon(link.platform)
         const href =
           link.platform === "whatsapp"
-            ? `https://wa.me/${link.url.replace(/[^0-9]/g, "")}`
+            ? link.url.includes("wa.me") || link.url.includes("whatsapp")
+              ? link.url
+              : `https://wa.me/${link.url.replace(/[^0-9]/g, "")}`
             : link.url
 
         return (

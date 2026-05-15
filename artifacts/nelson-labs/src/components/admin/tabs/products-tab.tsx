@@ -26,7 +26,7 @@ function ProductRow({
   onDelete: (id: string) => void
   onToggle: (product: Product) => void
   onMove: (index: number, dir: "up" | "down") => void
-  onUpdate: (id: string, fields: Partial<Product>) => void
+  onUpdate: () => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const [localProduct, setLocalProduct] = useState(product)
@@ -44,7 +44,7 @@ function ProductRow({
     }).eq("id", product.id)
     setSaving(false)
     setSaved(true)
-    onUpdate(product.id, localProduct)
+    onUpdate()
     setTimeout(() => setSaved(false), 2000)
   }
 

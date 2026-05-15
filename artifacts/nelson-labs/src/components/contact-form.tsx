@@ -57,6 +57,7 @@ export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
               required
+              autoComplete="name"
               className="w-full px-4 py-3 rounded-xl bg-input border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
             />
           </div>
@@ -79,7 +80,7 @@ export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
           <Button
             type="submit"
             disabled={submitted}
-            className="w-full py-6 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-base hover-glow-teal disabled:opacity-70 transition-all duration-300"
+            className="w-full py-6 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-base hover-glow disabled:opacity-70 transition-all duration-300"
           >
             {submitted ? (
               "Message Sent!"

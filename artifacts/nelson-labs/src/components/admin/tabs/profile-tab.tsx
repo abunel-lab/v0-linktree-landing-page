@@ -20,7 +20,7 @@ const SQL_MIGRATION = `ALTER TABLE site_settings
 
 export function ProfileTab({ settings, onChange }: ProfileTabProps) {
   const currentTheme = settings.theme || "teal"
-  const needsMigration = settings.announcement_active === undefined || settings.theme === undefined
+  const needsMigration = settings.announcement_active == null || settings.theme == null
 
   return (
     <div className="space-y-6">

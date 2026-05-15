@@ -8,7 +8,7 @@ import { ProductsTab } from "@/components/admin/tabs/products-tab"
 import { AnalyticsTab } from "@/components/admin/tabs/analytics-tab"
 import {
   User, Share2, Package, BarChart2,
-  LogOut, ExternalLink, Save, Loader2, Check
+  LogOut, ExternalLink, Save, Loader2, Check, AlertCircle
 } from "lucide-react"
 
 interface AdminDashboardProps {
@@ -39,6 +39,7 @@ export function AdminDashboard({
   const [activeTab, setActiveTab] = useState<Tab>("profile")
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [, setLocation] = useLocation()
 
   // Apply theme live as admin changes it
@@ -65,7 +66,7 @@ export function AdminDashboard({
   const handleSave = async () => {
     setSaving(true)
     const supabase = createClient()
-    await supabase.from("site_settings").update({
+    const { error } = await supabase.from("site_settings").update({
       display_name: settings.display_name,
       bio: settings.bio,
       profile_image_url: settings.profile_image_url,
@@ -75,8 +76,14 @@ export function AdminDashboard({
       theme: settings.theme || "teal",
     }).eq("id", settings.id)
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    if (error) {
+      setSaveError(error.message)
+      setTimeout(() => setSaveError(null), 4000)
+    } else {
+      setSaved(true)
+      setSaveError(null)
+      setTimeout(() => setSaved(false), 2000)
+    }
   }
 
   const handleLogout = async () => {
@@ -178,7 +185,7 @@ export function AdminDashboard({
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 max-w-2xl w-full">
+        <main className="flex-1 p-4 md:p-6 max-w-2xl w-full mx-auto">
           <div className="bg-card/30 border border-border rounded-2xl p-5">
             {activeTab === "profile" && (
               <ProfileTab settings={settings} onChange={updateField} />
@@ -195,7 +202,13 @@ export function AdminDashboard({
           </div>
 
           {activeTab === "profile" && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
+              {saveError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{saveError}</span>
+                </div>
+              )}
               <button
                 onClick={handleSave}
                 disabled={saving}

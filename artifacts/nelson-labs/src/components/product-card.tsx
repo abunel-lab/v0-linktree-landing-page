@@ -17,7 +17,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackClick(`product_${product.id}`)}
-        className="group relative block w-full overflow-hidden rounded-2xl hover-glow-teal"
+        className="group relative block w-full overflow-hidden rounded-2xl hover-glow"
       >
         <div className="absolute inset-0">
           <img

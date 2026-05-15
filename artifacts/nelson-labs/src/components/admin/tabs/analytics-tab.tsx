@@ -64,7 +64,11 @@ export function AnalyticsTab() {
             <p className="text-xs text-muted-foreground">Visitors & link clicks</p>
           </div>
         </div>
-        <button onClick={load} className="text-xs text-accent hover:underline px-2 py-1">
+        <button
+          onClick={load}
+          disabled={loading}
+          className="text-xs text-accent hover:underline px-2 py-1 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           Refresh
         </button>
       </div>
