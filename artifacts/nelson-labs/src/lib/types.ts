@@ -17,3 +17,24 @@ export interface SiteSettings {
   created_at: string
   updated_at: string
 }
+
+export interface SocialLink {
+  id: string
+  platform: string
+  label: string
+  url: string
+  position: number
+  active: boolean
+  created_at: string
+}
+
+export interface Product {
+  id: string
+  title: string
+  description: string | null
+  url: string
+  image_url: string | null
+  position: number
+  active: boolean
+  created_at: string
+}

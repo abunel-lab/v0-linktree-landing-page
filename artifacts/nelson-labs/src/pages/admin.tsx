@@ -2,11 +2,13 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useLocation } from "wouter"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
-import type { SiteSettings } from "@/lib/types"
+import type { SiteSettings, SocialLink, Product } from "@/lib/types"
 import { Loader2 } from "lucide-react"
 
 export default function AdminPage() {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [userEmail, setUserEmail] = useState("")
   const [loading, setLoading] = useState(true)
   const [, setLocation] = useLocation()
@@ -14,7 +16,7 @@ export default function AdminPage() {
   useEffect(() => {
     const supabase = createClient()
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) {
         setLocation("/admin/login")
         return
@@ -22,14 +24,17 @@ export default function AdminPage() {
 
       setUserEmail(user.email || "")
 
-      supabase
-        .from("site_settings")
-        .select("*")
-        .single()
-        .then(({ data }) => {
-          if (data) setSettings(data as SiteSettings)
-          setLoading(false)
-        })
+      const [settingsRes, socialRes, productsRes] = await Promise.all([
+        supabase.from("site_settings").select("*").single(),
+        supabase.from("social_links").select("*").order("position"),
+        supabase.from("products").select("*").order("position"),
+      ])
+
+      if (settingsRes.data) setSettings(settingsRes.data as SiteSettings)
+      if (socialRes.data) setSocialLinks(socialRes.data as SocialLink[])
+      if (productsRes.data) setProducts(productsRes.data as Product[])
+
+      setLoading(false)
     })
   }, [setLocation])
 
@@ -49,5 +54,12 @@ export default function AdminPage() {
     )
   }
 
-  return <AdminDashboard initialSettings={settings} userEmail={userEmail} />
+  return (
+    <AdminDashboard
+      initialSettings={settings}
+      initialSocialLinks={socialLinks}
+      initialProducts={products}
+      userEmail={userEmail}
+    />
+  )
 }
