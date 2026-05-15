@@ -11,12 +11,10 @@ interface ContactFormProps {
 export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
   const [name, setName] = useState("")
   const [message, setMessage] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
 
     trackClick("contact_whatsapp")
 
@@ -28,7 +26,6 @@ export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
 
     window.open(whatsappUrl, "_blank")
 
-    setIsSubmitting(false)
     setSubmitted(true)
     setName("")
     setMessage("")
@@ -81,13 +78,11 @@ export function ContactForm({ displayName, whatsappNumber }: ContactFormProps) {
 
           <Button
             type="submit"
-            disabled={isSubmitting || submitted}
+            disabled={submitted}
             className="w-full py-6 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-base hover-glow-teal disabled:opacity-70 transition-all duration-300"
           >
             {submitted ? (
               "Message Sent!"
-            ) : isSubmitting ? (
-              "Sending..."
             ) : (
               <span className="flex items-center justify-center gap-2">
                 Send

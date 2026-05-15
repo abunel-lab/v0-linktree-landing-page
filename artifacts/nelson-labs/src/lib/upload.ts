@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/client"
 
 export async function uploadImage(file: File): Promise<string> {
   const supabase = createClient()
-  const ext = file.name.split(".").pop()
+  const rawExt = file.name.split(".").pop()
+  const ext = rawExt && rawExt.length <= 5 ? rawExt : "jpg"
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
   const { error } = await supabase.storage

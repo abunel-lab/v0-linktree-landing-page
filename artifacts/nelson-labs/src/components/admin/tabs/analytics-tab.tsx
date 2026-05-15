@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { getVisitorCount } from "@/lib/analytics"
 import { getPlatformLabel } from "@/lib/platforms"
@@ -23,11 +23,7 @@ export function AnalyticsTab() {
   const [totalVisitors, setTotalVisitors] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    load()
-  }, [])
-
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
     const [{ data }, visitors] = await Promise.all([
@@ -48,7 +44,11 @@ export function AnalyticsTab() {
     }
     setTotalVisitors(visitors)
     setLoading(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
 
   const maxCount = clickStats.length > 0 ? clickStats[0].count : 1
 

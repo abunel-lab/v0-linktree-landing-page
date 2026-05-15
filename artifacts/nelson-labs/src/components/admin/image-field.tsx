@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { Image as ImageIcon, Upload, X, Loader2 } from "lucide-react"
+import { Image as ImageIcon, Upload, X } from "lucide-react"
 import { CropModal } from "@/components/admin/crop-modal"
 
 interface ImageFieldProps {
@@ -16,7 +16,6 @@ export function ImageField({ label, value, fieldKey, placeholder, hint, aspect, 
   const inputRef = useRef<HTMLInputElement>(null)
   const [cropSrc, setCropSrc] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
-  const [uploading, setUploading] = useState(false)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -80,11 +79,10 @@ export function ImageField({ label, value, fieldKey, placeholder, hint, aspect, 
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            disabled={uploading}
-            className="shrink-0 flex items-center gap-1.5 bg-muted/50 border border-border hover:bg-muted hover:border-accent/50 text-muted-foreground hover:text-foreground px-3 py-3 rounded-xl transition-all disabled:opacity-50"
+            className="shrink-0 flex items-center gap-1.5 bg-muted/50 border border-border hover:bg-muted hover:border-accent/50 text-muted-foreground hover:text-foreground px-3 py-3 rounded-xl transition-all"
             title="Upload from gallery"
           >
-            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            <Upload className="w-4 h-4" />
           </button>
           <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { SocialLink } from "@/lib/types"
 import { PLATFORMS, getPlatformIcon, getPlatformLabel } from "@/lib/platforms"
 import {
-  Share2, Plus, Trash2, GripVertical, Eye, EyeOff, Loader2, Check, ChevronUp, ChevronDown
+  Share2, Plus, Trash2, Eye, EyeOff, Loader2, ChevronUp, ChevronDown
 } from "lucide-react"
 
 interface SocialTabProps {

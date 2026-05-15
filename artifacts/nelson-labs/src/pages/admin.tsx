@@ -24,15 +24,18 @@ export default function AdminPage() {
 
       setUserEmail(user.email || "")
 
-      const [settingsRes, socialRes, productsRes] = await Promise.all([
+      const [settingsRes, socialRes, productsRes] = await Promise.allSettled([
         supabase.from("site_settings").select("*").single(),
         supabase.from("social_links").select("*").order("position"),
         supabase.from("products").select("*").order("position"),
       ])
 
-      if (settingsRes.data) setSettings(settingsRes.data as SiteSettings)
-      if (socialRes.data) setSocialLinks(socialRes.data as SocialLink[])
-      if (productsRes.data) setProducts(productsRes.data as Product[])
+      if (settingsRes.status === "fulfilled" && settingsRes.value.data)
+        setSettings(settingsRes.value.data as SiteSettings)
+      if (socialRes.status === "fulfilled" && socialRes.value.data)
+        setSocialLinks(socialRes.value.data as SocialLink[])
+      if (productsRes.status === "fulfilled" && productsRes.value.data)
+        setProducts(productsRes.value.data as Product[])
 
       setLoading(false)
     })
