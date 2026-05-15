@@ -4,10 +4,13 @@ import { ProfileHeader } from "@/components/profile-header"
 import { SocialIcons } from "@/components/social-icons"
 import { FeaturedCard } from "@/components/featured-card"
 import { ContactForm } from "@/components/contact-form"
+import { trackVisit, getVisitorCount } from "@/lib/analytics"
 import type { SiteSettings } from "@/lib/types"
+import { Eye } from "lucide-react"
 
 export default function HomePage() {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
+  const [visitorCount, setVisitorCount] = useState<number | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -18,6 +21,10 @@ export default function HomePage() {
       .then(({ data }) => {
         if (data) setSettings(data as SiteSettings)
       })
+
+    trackVisit().then(() => {
+      getVisitorCount().then(setVisitorCount)
+    })
   }, [])
 
   return (
@@ -61,8 +68,14 @@ export default function HomePage() {
             whatsappNumber={settings?.whatsapp_number || "256709331135"}
           />
 
-          <footer className="text-center pt-4 opacity-0 animate-fade-in delay-500">
-            <p className="text-xs text-muted-foreground/60">
+          <footer className="text-center pt-4 opacity-0 animate-fade-in delay-500 space-y-2">
+            {visitorCount !== null && (
+              <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/50">
+                <Eye className="w-3 h-3" />
+                <span>{visitorCount.toLocaleString()} {visitorCount === 1 ? "visit" : "visits"}</span>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground/40">
               Powered by passion
             </p>
           </footer>

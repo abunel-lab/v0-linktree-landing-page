@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { uploadImage } from "@/lib/upload"
 import { useLocation } from "wouter"
 import type { SiteSettings } from "@/lib/types"
 import {
@@ -14,6 +15,8 @@ import {
   Image as ImageIcon,
   BarChart2,
   MousePointerClick,
+  Upload,
+  X,
 } from "lucide-react"
 
 interface AdminDashboardProps {
@@ -37,6 +40,97 @@ const LINK_LABELS: Record<string, string> = {
   contact_whatsapp: "Contact Form",
 }
 
+interface ImageFieldProps {
+  label: string
+  value: string | null
+  fieldKey: string
+  placeholder: string
+  hint: string
+  onChange: (field: string, value: string) => void
+}
+
+function ImageField({ label, value, fieldKey, placeholder, hint, onChange }: ImageFieldProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadError(null)
+    setUploading(true)
+    try {
+      const url = await uploadImage(file)
+      onChange(fieldKey, url)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Upload failed"
+      setUploadError(msg)
+    } finally {
+      setUploading(false)
+      if (inputRef.current) inputRef.current.value = ""
+    }
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <label className="text-sm font-medium text-foreground flex items-center gap-2">
+        <ImageIcon className="w-4 h-4" />
+        {label}
+      </label>
+
+      {value && (
+        <div className="relative w-full h-24 rounded-xl overflow-hidden border border-border">
+          <img src={value} alt="Preview" className="w-full h-full object-cover" />
+          <button
+            type="button"
+            onClick={() => onChange(fieldKey, "")}
+            className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <input
+          type="url"
+          value={value || ""}
+          onChange={(e) => onChange(fieldKey, e.target.value)}
+          className="flex-1 bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
+          placeholder={placeholder}
+          autoComplete="off"
+          inputMode="url"
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="shrink-0 flex items-center gap-1.5 bg-muted/50 border border-border hover:bg-muted hover:border-accent/50 text-muted-foreground hover:text-foreground px-3 py-3 rounded-xl transition-all disabled:opacity-50"
+          title="Upload from gallery"
+        >
+          {uploading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4" />
+          )}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      </div>
+
+      {uploadError && (
+        <p className="text-xs text-red-400">{uploadError}. Make sure your Supabase "images" storage bucket exists and is public.</p>
+      )}
+      {!uploadError && <p className="text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  )
+}
+
 export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardProps) {
   const [settings, setSettings] = useState<SiteSettings>(initialSettings)
   const [activeTab, setActiveTab] = useState<"profile" | "social" | "featured" | "analytics">("profile")
@@ -56,9 +150,7 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
   const loadAnalytics = async () => {
     setStatsLoading(true)
     const supabase = createClient()
-    const { data } = await supabase
-      .from("link_clicks")
-      .select("link_type")
+    const { data } = await supabase.from("link_clicks").select("link_type")
 
     if (data) {
       const counts: Record<string, number> = {}
@@ -112,7 +204,7 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
     setLocation("/admin/login")
   }
 
-  const updateField = (field: keyof SiteSettings, value: string) => {
+  const updateField = (field: string, value: string) => {
     setSettings((prev) => ({ ...prev, [field]: value || null }))
   }
 
@@ -204,22 +296,16 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     autoComplete="off"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" />
-                    Profile Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={settings.profile_image_url || ""}
-                    onChange={(e) => updateField("profile_image_url", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
-                    placeholder="https://example.com/photo.jpg"
-                    autoComplete="off"
-                    inputMode="url"
-                  />
-                  <p className="text-xs text-muted-foreground">Direct link to your profile image (JPG, PNG, WebP)</p>
-                </div>
+
+                <ImageField
+                  label="Profile Image"
+                  value={settings.profile_image_url}
+                  fieldKey="profile_image_url"
+                  placeholder="https://example.com/photo.jpg"
+                  hint="Paste a URL or tap the upload icon to choose from your gallery"
+                  onChange={updateField}
+                />
+
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground">WhatsApp Number</label>
                   <input
@@ -305,22 +391,15 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     inputMode="url"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" />
-                    Background Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={settings.featured_image_url || ""}
-                    onChange={(e) => updateField("featured_image_url", e.target.value)}
-                    className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-base"
-                    placeholder="https://example.com/image.jpg"
-                    autoComplete="off"
-                    inputMode="url"
-                  />
-                  <p className="text-xs text-muted-foreground">Leave blank to use the default gradient</p>
-                </div>
+
+                <ImageField
+                  label="Background Image"
+                  value={settings.featured_image_url}
+                  fieldKey="featured_image_url"
+                  placeholder="https://example.com/image.jpg"
+                  hint="Paste a URL or tap the upload icon to choose from your gallery. Leave blank to use the default gradient."
+                  onChange={updateField}
+                />
               </div>
             </div>
           )}
@@ -329,10 +408,7 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
             <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground">Link Analytics</h2>
-                <button
-                  onClick={loadAnalytics}
-                  className="text-xs text-accent hover:underline"
-                >
+                <button onClick={loadAnalytics} className="text-xs text-accent hover:underline">
                   Refresh
                 </button>
               </div>
@@ -353,7 +429,6 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                     <span className="text-sm text-muted-foreground">Total clicks</span>
                     <span className="text-2xl font-bold text-foreground">{totalClicks}</span>
                   </div>
-
                   <div className="space-y-3">
                     {clickStats.map((stat) => {
                       const pct = Math.round((stat.count / maxCount) * 100)
