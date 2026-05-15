@@ -13,24 +13,60 @@ export default function HomePage() {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [visitorCount, setVisitorCount] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
 
-    Promise.all([
+    Promise.allSettled([
       supabase.from("site_settings").select("*").single(),
       supabase.from("social_links").select("*").order("position"),
       supabase.from("products").select("*").order("position"),
     ]).then(([settingsRes, socialRes, productsRes]) => {
-      if (settingsRes.data) setSettings(settingsRes.data as SiteSettings)
-      if (socialRes.data) setSocialLinks(socialRes.data as SocialLink[])
-      if (productsRes.data) setProducts(productsRes.data as Product[])
+      if (settingsRes.status === "fulfilled" && settingsRes.value.data)
+        setSettings(settingsRes.value.data as SiteSettings)
+      if (socialRes.status === "fulfilled" && socialRes.value.data)
+        setSocialLinks(socialRes.value.data as SocialLink[])
+      if (productsRes.status === "fulfilled" && productsRes.value.data)
+        setProducts(productsRes.value.data as Product[])
+      setLoading(false)
     })
 
     trackVisit().then(() => getVisitorCount().then(setVisitorCount))
   }, [])
 
   const activeProducts = products.filter((p) => p.active).sort((a, b) => a.position - b.position)
+
+  if (loading) {
+    return (
+      <>
+        <div
+          className="fixed inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse at top, oklch(0.18 0.03 250) 0%, oklch(0.12 0.02 250) 50%, oklch(0.08 0.015 250) 100%)",
+          }}
+          aria-hidden="true"
+        />
+        <main className="min-h-screen flex flex-col items-center px-4 py-12 md:py-16">
+          <div className="w-full max-w-md space-y-8 animate-pulse">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-28 h-28 rounded-full bg-muted/40" />
+              <div className="h-8 w-48 rounded-xl bg-muted/40" />
+              <div className="h-4 w-64 rounded-lg bg-muted/30" />
+            </div>
+            <div className="flex justify-center gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-10 h-10 rounded-full bg-muted/40" />
+              ))}
+            </div>
+            <div className="h-64 rounded-2xl bg-muted/30" />
+            <div className="h-48 rounded-2xl bg-muted/30" />
+          </div>
+        </main>
+      </>
+    )
+  }
 
   return (
     <>
@@ -72,7 +108,7 @@ export default function HomePage() {
                 </span>
               </div>
             )}
-            <p className="text-xs text-muted-foreground/40">Powered by passion</p>
+            <p className="text-xs text-muted-foreground/40">Nelson_Labs</p>
           </footer>
         </div>
       </main>
