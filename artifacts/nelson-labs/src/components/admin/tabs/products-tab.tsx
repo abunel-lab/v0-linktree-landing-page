@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/client"
 import type { Product } from "@/lib/types"
 import { ImageField } from "@/components/admin/image-field"
 import {
-  Package, Plus, Trash2, Eye, EyeOff, Loader2, ChevronUp, ChevronDown, ChevronDown as CollapseIcon
+  Package, Plus, Trash2, Eye, EyeOff, Loader2, ChevronUp, ChevronDown
 } from "lucide-react"
 
 interface ProductsTabProps {
@@ -90,7 +90,7 @@ function ProductRow({
             onClick={() => setExpanded(!expanded)}
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
           >
-            <CollapseIcon className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
           </button>
         </div>
       </div>
