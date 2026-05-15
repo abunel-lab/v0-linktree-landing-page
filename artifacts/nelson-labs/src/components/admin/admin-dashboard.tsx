@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { uploadImage } from "@/lib/upload"
+import { getVisitorCount } from "@/lib/analytics"
 import { useLocation } from "wouter"
 import type { SiteSettings } from "@/lib/types"
 import {
@@ -17,6 +18,7 @@ import {
   MousePointerClick,
   Upload,
   X,
+  Eye,
 } from "lucide-react"
 
 interface AdminDashboardProps {
@@ -140,6 +142,7 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
   const [clickStats, setClickStats] = useState<ClickStat[]>([])
   const [statsLoading, setStatsLoading] = useState(false)
   const [totalClicks, setTotalClicks] = useState(0)
+  const [totalVisitors, setTotalVisitors] = useState<number | null>(null)
 
   useEffect(() => {
     if (activeTab === "analytics") {
@@ -150,7 +153,11 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
   const loadAnalytics = async () => {
     setStatsLoading(true)
     const supabase = createClient()
-    const { data } = await supabase.from("link_clicks").select("link_type")
+
+    const [{ data }, visitors] = await Promise.all([
+      supabase.from("link_clicks").select("link_type"),
+      getVisitorCount(),
+    ])
 
     if (data) {
       const counts: Record<string, number> = {}
@@ -163,6 +170,7 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
       setClickStats(stats)
       setTotalClicks(data.length)
     }
+    setTotalVisitors(visitors)
     setStatsLoading(false)
   }
 
@@ -425,9 +433,23 @@ export function AdminDashboard({ initialSettings, userEmail }: AdminDashboardPro
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-muted/30 rounded-xl px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Total clicks</span>
-                    <span className="text-2xl font-bold text-foreground">{totalClicks}</span>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-muted/30 rounded-xl px-4 py-3 space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Eye className="w-3.5 h-3.5" />
+                        Total visitors
+                      </div>
+                      <p className="text-2xl font-bold text-foreground">
+                        {totalVisitors !== null ? totalVisitors.toLocaleString() : "—"}
+                      </p>
+                    </div>
+                    <div className="bg-muted/30 rounded-xl px-4 py-3 space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <MousePointerClick className="w-3.5 h-3.5" />
+                        Total clicks
+                      </div>
+                      <p className="text-2xl font-bold text-foreground">{totalClicks.toLocaleString()}</p>
+                    </div>
                   </div>
                   <div className="space-y-3">
                     {clickStats.map((stat) => {
