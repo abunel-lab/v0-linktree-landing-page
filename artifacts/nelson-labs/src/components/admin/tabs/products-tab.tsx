@@ -130,7 +130,8 @@ function ProductRow({
             value={localProduct.image_url}
             fieldKey="image_url"
             placeholder="https://example.com/image.jpg"
-            hint="Paste URL or upload from gallery. Leave blank for gradient."
+            hint="Paste URL or upload from gallery. Image will be cropped 16:9."
+            aspect={16 / 9}
             onChange={(_, value) => updateLocal("image_url", value)}
           />
           <button

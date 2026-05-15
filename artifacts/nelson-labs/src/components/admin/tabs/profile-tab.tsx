@@ -50,7 +50,8 @@ export function ProfileTab({ settings, onChange }: ProfileTabProps) {
           value={settings.profile_image_url}
           fieldKey="profile_image_url"
           placeholder="https://example.com/photo.jpg"
-          hint="Paste a URL or tap the upload icon to choose from your gallery"
+          hint="Paste a URL or tap the upload icon to choose from your gallery. Photo will be cropped square."
+          aspect={1}
           onChange={onChange}
         />
 

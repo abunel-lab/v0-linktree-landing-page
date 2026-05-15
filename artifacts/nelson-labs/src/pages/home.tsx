@@ -37,6 +37,23 @@ export default function HomePage() {
 
   const activeProducts = products.filter((p) => p.active).sort((a, b) => a.position - b.position)
 
+  // Fall back to site_settings featured card when products table is empty or not yet created
+  const fallbackProduct: Product | null =
+    activeProducts.length === 0 && settings !== null
+      ? {
+          id: "featured-fallback",
+          title: settings.featured_title || "SMC Terminal",
+          description: settings.featured_description || null,
+          url: settings.featured_url || "#",
+          image_url: settings.featured_image_url || "/images/product-hero.jpg",
+          position: 0,
+          active: true,
+          created_at: "",
+        }
+      : null
+
+  const displayProducts = activeProducts.length > 0 ? activeProducts : fallbackProduct ? [fallbackProduct] : []
+
   if (loading) {
     return (
       <>
@@ -90,7 +107,7 @@ export default function HomePage() {
 
           <SocialIcons links={socialLinks} />
 
-          {activeProducts.map((product, index) => (
+          {displayProducts.map((product, index) => (
             <ProductCard key={product.id} product={product} index={index} />
           ))}
 
