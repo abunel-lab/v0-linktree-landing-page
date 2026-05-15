@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useLocation } from "wouter"
 import type { SiteSettings, SocialLink, Product } from "@/lib/types"
@@ -41,6 +41,15 @@ export function AdminDashboard({
   const [saved, setSaved] = useState(false)
   const [, setLocation] = useLocation()
 
+  // Apply theme live as admin changes it
+  useEffect(() => {
+    if (settings.theme) {
+      document.documentElement.setAttribute("data-theme", settings.theme)
+    } else {
+      document.documentElement.removeAttribute("data-theme")
+    }
+  }, [settings.theme])
+
   const reloadSocialLinks = async () => {
     const supabase = createClient()
     const { data } = await supabase.from("social_links").select("*").order("position")
@@ -61,6 +70,9 @@ export function AdminDashboard({
       bio: settings.bio,
       profile_image_url: settings.profile_image_url,
       whatsapp_number: settings.whatsapp_number,
+      announcement_text: settings.announcement_text,
+      announcement_active: settings.announcement_active,
+      theme: settings.theme || "teal",
     }).eq("id", settings.id)
     setSaving(false)
     setSaved(true)
@@ -73,12 +85,13 @@ export function AdminDashboard({
     setLocation("/admin/login")
   }
 
-  const updateField = (field: string, value: string) => {
-    setSettings((prev) => ({ ...prev, [field]: value || null }))
+  const updateField = (field: string, value: string | boolean | null) => {
+    setSettings((prev) => ({ ...prev, [field]: value === "" ? null : value }))
   }
 
   return (
     <div className="min-h-screen bg-background flex">
+      {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-border bg-card/30 backdrop-blur-sm sticky top-0 h-screen">
         <div className="p-5 border-b border-border">
           <div className="flex items-center gap-2.5">
@@ -129,6 +142,7 @@ export function AdminDashboard({
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile header */}
         <header className="md:hidden sticky top-0 z-50 border-b border-border bg-card/50 backdrop-blur-sm">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">

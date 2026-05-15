@@ -14,6 +14,9 @@ export interface SiteSettings {
   social_whatsapp: string | null
   social_telegram: string | null
   whatsapp_number: string | null
+  announcement_text: string | null
+  announcement_active: boolean
+  theme: "teal" | "gold" | "purple" | null
   created_at: string
   updated_at: string
 }

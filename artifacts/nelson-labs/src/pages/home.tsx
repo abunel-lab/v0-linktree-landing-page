@@ -4,6 +4,7 @@ import { ProfileHeader } from "@/components/profile-header"
 import { SocialIcons } from "@/components/social-icons"
 import { ProductCard } from "@/components/product-card"
 import { ContactForm } from "@/components/contact-form"
+import { AnnouncementBanner } from "@/components/announcement-banner"
 import { trackVisit, getVisitorCount } from "@/lib/analytics"
 import type { SiteSettings, SocialLink, Product } from "@/lib/types"
 import { Eye } from "lucide-react"
@@ -35,6 +36,15 @@ export default function HomePage() {
     trackVisit().then(() => getVisitorCount().then(setVisitorCount))
   }, [])
 
+  // Apply theme to <html> whenever settings change
+  useEffect(() => {
+    if (settings?.theme) {
+      document.documentElement.setAttribute("data-theme", settings.theme)
+    } else {
+      document.documentElement.removeAttribute("data-theme")
+    }
+  }, [settings?.theme])
+
   const activeProducts = products.filter((p) => p.active).sort((a, b) => a.position - b.position)
 
   // Fall back to site_settings featured card when products table is empty or not yet created
@@ -57,14 +67,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <>
-        <div
-          className="fixed inset-0 -z-10"
-          style={{
-            background:
-              "radial-gradient(ellipse at top, oklch(0.18 0.03 250) 0%, oklch(0.12 0.02 250) 50%, oklch(0.08 0.015 250) 100%)",
-          }}
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0 -z-10 page-bg" aria-hidden="true" />
         <main className="min-h-screen flex flex-col items-center px-4 py-12 md:py-16">
           <div className="w-full max-w-md space-y-8 animate-pulse">
             <div className="flex flex-col items-center gap-4">
@@ -88,13 +91,11 @@ export default function HomePage() {
   return (
     <>
       <div className="grain-overlay" aria-hidden="true" />
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse at top, oklch(0.18 0.03 250) 0%, oklch(0.12 0.02 250) 50%, oklch(0.08 0.015 250) 100%)",
-        }}
-        aria-hidden="true"
+      <div className="fixed inset-0 -z-10 page-bg" aria-hidden="true" />
+
+      <AnnouncementBanner
+        text={settings?.announcement_text || ""}
+        active={settings?.announcement_active || false}
       />
 
       <main className="min-h-screen flex flex-col items-center px-4 py-12 md:py-16">
