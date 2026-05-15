@@ -1,10 +1,10 @@
 import { createServer } from "http";
 import { readFile, stat } from "fs/promises";
-import { join, extname } from "path";
+import { join, extname, resolve, normalize } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const distDir = join(__dirname, "dist/public");
+const distDir = resolve(join(__dirname, "dist/public"));
 const port = process.env.PORT || 3000;
 
 const mimeTypes = {
@@ -25,17 +25,28 @@ const mimeTypes = {
   ".json": "application/json",
 };
 
+const safeJoin = (base, urlPath) => {
+  const safe = normalize("/" + urlPath).replace(/^(\.\.(\/|\\|$))+/, "");
+  const resolved = resolve(join(base, safe));
+  if (!resolved.startsWith(base + "/") && resolved !== base) return null;
+  return resolved;
+};
+
 const server = createServer(async (req, res) => {
-  let urlPath = req.url.split("?")[0];
+  const urlPath = req.url.split("?")[0];
 
   const tryFile = async (filePath) => {
+    if (!filePath) return false;
     try {
       const s = await stat(filePath);
       if (s.isFile()) {
         const ext = extname(filePath).toLowerCase();
         const contentType = mimeTypes[ext] || "application/octet-stream";
         const data = await readFile(filePath);
-        res.writeHead(200, { "Content-Type": contentType });
+        res.writeHead(200, {
+          "Content-Type": contentType,
+          "X-Content-Type-Options": "nosniff",
+        });
         res.end(data);
         return true;
       }
@@ -43,8 +54,8 @@ const server = createServer(async (req, res) => {
     return false;
   };
 
-  if (await tryFile(join(distDir, urlPath))) return;
-  if (await tryFile(join(distDir, urlPath, "index.html"))) return;
+  if (await tryFile(safeJoin(distDir, urlPath))) return;
+  if (await tryFile(safeJoin(distDir, urlPath + "/index.html"))) return;
 
   // SPA fallback
   try {
